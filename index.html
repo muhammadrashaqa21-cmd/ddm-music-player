@@ -2,7 +2,8 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#F4F1EA">
   <title>DDM Music | Pemutar Audio</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
@@ -31,6 +32,7 @@
       background-color: var(--bg-base);
       color: var(--text-primary);
       height: 100vh;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -787,7 +789,7 @@
     @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
     @media (max-width: 768px) {
-      .app-container { flex-direction: column; height: calc(100vh - 82px); margin-top: 18px; }
+      .app-container { flex-direction: column; height: calc(100dvh - 82px - env(safe-area-inset-bottom)); margin-top: max(18px, env(safe-area-inset-top)); }
       .sidebar { width: 100%; padding: 9px 12px; flex-direction: row; align-items: center; gap: 10px; }
       .logo-container { padding: 0 4px; }
       .logo-text, .import-box { display: none; }
@@ -802,7 +804,7 @@
       .now-playing { width: 45%; }
       .player-controls { width: 55%; }
       .dynamic-island.expanded { width: 92vw; }
-      .player-bar { height: 82px; padding: 0 12px; gap: 8px; }
+      .player-bar { height: calc(82px + env(safe-area-inset-bottom)); padding: 0 12px env(safe-area-inset-bottom); gap: 8px; }
       .control-buttons { gap: 15px; }
       .np-art { width: 40px; height: 40px; }
       .np-info h5 { max-width: 120px; }
