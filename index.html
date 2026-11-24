@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DDM Music | Pemutar Audio</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      /* Palet Warna Baru: Cream & Biru Muda (Sky Blue) */
+      --bg-base: #F4F1EA;         /* Cream lembut latar belakang */
+      --bg-surface: #FFFFFF;      /* Putih bersih untuk kartu/sidebar */
+      --bg-elevated: #E8F1F5;     /* Biru muda transparan untuk hover */
+      --accent-main: #3A86EF;     /* Biru utama yang elegan */
+      --accent-hover: #2667CC;
+      --accent-cream: #E9D8A6;    /* Aksen cream lembut */
+      --accent-blue-soft: #ADE8F4;/* Biru muda pastel */
+      --text-primary: #1D3557;    /* Biru gelap pekat untuk teks utama */
+      --text-secondary: #6C757D;  /* Abu-abu netral */
+      --island-bg: #101820;       /* Hitam elegan untuk Dynamic Island */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* ================= DYNAMIC ISLAND (TENGAH ATAS / KAMERA) ================= */
+    .dynamic-island-wrapper {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .dynamic-island {
+      pointer-events: auto;
+      background: var(--island-bg);
+      border: 1px solid rgba(173, 232, 244, 0.3);
+      box-shadow: 0 10px 28px rgba(29, 53, 87, 0.2), 0 0 15px rgba(58, 134, 239, 0.2);
+      border-radius: 30px;
+      width: 90px;
+      height: 28px;
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+      opacity: 0.45;
+      transform: scale(0.9);
+      transition: all 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    .dynamic-island.playing {
+      opacity: 1;
+      transform: scale(1);
+      width: 260px;
+      height: 38px;
+      padding: 0 14px;
+      justify-content: space-between;
+    }
+
+    .dynamic-island.expanded {
+      width: 370px;
+      height: 165px;
+      border-radius: 36px;
+      padding: 18px 22px;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: default;
+      background: rgba(16, 24, 32, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(173, 232, 244, 0.4);
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .island-compact {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .dynamic-island.playing .island-compact { opacity: 1; }
+    .dynamic-island.expanded .island-compact { display: none; }
+
+    .island-art-mini {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-main), var(--accent-cream));
+      color: #1D3557;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      animation: spin 8s linear infinite;
+    }
+
+    .island-mini-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #F8F9FA;
+      max-width: 135px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0 6px;
+    }
+
+    /* Equalizer Real-Time Beat */
+    .eq-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 2.5px;
+      height: 16px;
+      width: 24px;
+      justify-content: flex-end;
+    }
+
+    .eq-bar {
+      width: 3px;
+      height: 3px;
+      background-color: var(--accent-blue-soft);
+      border-radius: 2px;
+      transition: height 0.05s linear;
+    }
+
+    .island-expanded {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #F8F9FA;
+    }
+
+    .dynamic-island.expanded .island-expanded {
+      display: flex;
+      animation: fadeIn 0.35s ease forwards;
+    }
+
+    .island-exp-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .island-art-large {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent-main), var(--accent-cream));
+      color: #1D3557;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      flex-shrink: 0;
+    }
+
+    .island-exp-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .island-exp-title {
+      font-size: 15px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .island-exp-artist {
+      font-size: 11px;
+      color: var(--accent-blue-soft);
+      margin-top: 3px;
+    }
+
+    .island-btn {
+      background: none;
+      border: none;
+      color: #F8F9FA;
+      font-size: 18px;
+      cursor: pointer;
+      transition: transform 0.15s, color 0.15s;
+    }
+
+    .island-btn:hover {
+      color: var(--accent-blue-soft);
+      transform: scale(1.15);
+    }
+
+    .island-exp-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+    }
+
+    /* ================= LAYOUT UTAMA ================= */
+    .app-container {
+      display: flex;
+      flex: 1;
+      padding: 10px;
+      gap: 10px;
+      height: calc(100vh - 90px);
+      margin-top: 22px;
+    }
+
+    .sidebar {
+      width: 280px;
+      background-color: var(--bg-surface);
+      border: 1px solid rgba(58, 134, 239, 0.15);
+      border-radius: 16px;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Logo DDM Styling */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 8px;
+    }
+
+    .ddm-logo-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-main), var(--accent-cream));
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: -0.5px;
+      box-shadow: 0 4px 10px rgba(58, 134, 239, 0.2);
+      flex-shrink: 0;
+    }
+
+    .logo-text h2 {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      color: var(--text-primary);
+    }
+
+    .logo-text span {
+      font-size: 10px;
+      color: var(--text-secondary);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .nav-menu {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      color: var(--accent-main);
+      background-color: var(--bg-elevated);
+    }
+
+    .import-box {
+      margin-top: auto;
+      background: linear-gradient(145deg, #FFFFFF, var(--accent-cream));
+      border: 1px dashed var(--accent-main);
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .btn-import {
+      background-color: var(--accent-main);
+      color: #ffffff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 25px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(58, 134, 239, 0.25);
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .btn-import:hover {
+      background-color: var(--accent-hover);
+      transform: scale(1.04);
+    }
+
+    .main-view {
+      flex: 1;
+      background: linear-gradient(180deg, var(--accent-blue-soft) 0%, var(--bg-surface) 45%);
+      border: 1px solid rgba(58, 134, 239, 0.15);
+      border-radius: 16px;
+      padding: 40px 28px 28px 28px;
+      overflow-y: auto;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    .header-banner {
+      display: flex;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .playlist-cover {
+      width: 150px;
+      height: 150px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent-main), var(--accent-cream));
+      box-shadow: 0 12px 28px rgba(58, 134, 239, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 54px;
+      color: var(--text-primary);
+    }
+
+    .playlist-meta h1 {
+      font-size: 38px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .song-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .song-table th {
+      text-align: left;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(58, 134, 239, 0.15);
+    }
+
+    .song-row {
+      border-radius: 10px;
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .song-row:hover { background-color: var(--bg-elevated); }
+    .song-row.active { background-color: rgba(58, 134, 239, 0.12); }
+
+    .song-row td {
+      padding: 12px 14px;
+      font-size: 14px;
+    }
+
+    .song-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .song-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background-color: var(--bg-elevated);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-main);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--text-secondary);
+    }
+
+    /* ================= BOTTOM PLAYER BAR ================= */
+    .player-bar {
+      height: 90px;
+      background-color: var(--bg-surface);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(58, 134, 239, 0.15);
+    }
+
+    .now-playing {
+      width: 30%;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .np-art {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      background: var(--bg-elevated);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-main);
+      font-size: 18px;
+    }
+
+    .np-info h5 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .np-meta-row {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .player-controls {
+      width: 40%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-buttons {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .ctrl-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 16px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .ctrl-btn:hover { color: var(--accent-main); }
+
+    .ctrl-btn.play-main {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background-color: var(--accent-main);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      box-shadow: 0 4px 10px rgba(58, 134, 239, 0.25);
+    }
+
+    .ctrl-btn.play-main:hover {
+      background-color: var(--accent-hover);
+      transform: scale(1.06);
+    }
+
+    .progress-container {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: #D8E2DC;
+      height: 5px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--accent-main);
+    }
+
+    #progress-bar { flex: 1; }
+
+    .volume-controls {
+      width: 30%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      color: var(--text-secondary);
+    }
+
+    .ddm-logo-image {
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .main-view {
+      background: linear-gradient(180deg, #eaf3fa 0%, var(--bg-surface) 250px);
+      padding: 34px clamp(18px, 3vw, 42px);
+    }
+
+    .view-section[hidden] { display: none; }
+
+    .nav-item { user-select: none; }
+    .nav-item:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 3px solid rgba(58, 134, 239, 0.35);
+      outline-offset: 2px;
+    }
+
+    .page-kicker {
+      color: var(--accent-main);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .page-heading {
+      color: var(--text-primary);
+      font-size: clamp(26px, 4vw, 36px);
+      line-height: 1.15;
+      letter-spacing: -0.8px;
+    }
+
+    .page-description {
+      color: var(--text-secondary);
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 30px 0 14px;
+    }
+
+    .section-heading h2 { font-size: 19px; }
+    .section-heading p { color: var(--text-secondary); font-size: 12px; margin-top: 4px; }
+
+    .browse-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin: 26px 0 18px;
+    }
+
+    .search-field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 260px;
+      max-width: 520px;
+      height: 46px;
+      padding: 0 15px;
+      background: #fff;
+      border: 1px solid rgba(29, 53, 87, 0.12);
+      border-radius: 12px;
+      color: var(--text-secondary);
+      box-shadow: 0 3px 12px rgba(29, 53, 87, 0.04);
+    }
+
+    .search-field input {
+      min-width: 0;
+      flex: 1;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+
+    .filter-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .filter-chip {
+      border: 1px solid rgba(29, 53, 87, 0.12);
+      background: #fff;
+      color: var(--text-secondary);
+      padding: 9px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 650;
+      font-size: 12px;
+    }
+
+    .filter-chip.active, .filter-chip:hover {
+      color: #fff;
+      background: var(--text-primary);
+      border-color: var(--text-primary);
+    }
+
+    .browse-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+      gap: 16px;
+    }
+
+    .browse-card {
+      min-width: 0;
+      padding: 14px;
+      background: rgba(255,255,255,0.88);
+      border: 1px solid rgba(29, 53, 87, 0.08);
+      border-radius: 15px;
+      box-shadow: 0 5px 18px rgba(29, 53, 87, 0.05);
+      cursor: pointer;
+      transition: transform 0.18s, box-shadow 0.18s;
+    }
+
+    .browse-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(29, 53, 87, 0.1);
+    }
+
+    .browse-card-art {
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      margin-bottom: 13px;
+      border-radius: 11px;
+      background: linear-gradient(145deg, #cce5f8, #f1e7d2);
+      color: var(--accent-main);
+      font-size: 32px;
+    }
+
+    .browse-card h3 {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-size: 14px;
+    }
+
+    .browse-card p { color: var(--text-secondary); font-size: 12px; margin-top: 5px; }
+
+    .browse-empty {
+      grid-column: 1 / -1;
+      padding: 52px 20px;
+      border: 1px dashed rgba(29, 53, 87, 0.2);
+      border-radius: 16px;
+      text-align: center;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    .eq-panel {
+      max-width: 850px;
+      margin-top: 25px;
+      padding: clamp(18px, 3vw, 28px);
+      border: 1px solid rgba(29, 53, 87, 0.1);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 8px 26px rgba(29, 53, 87, 0.06);
+    }
+
+    .eq-mode-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(29, 53, 87, 0.1);
+    }
+
+    .eq-mode-row h2 { font-size: 17px; }
+    .eq-mode-row p { color: var(--text-secondary); font-size: 12px; margin-top: 5px; }
+    .eq-select {
+      min-width: 150px;
+      padding: 10px 12px;
+      border: 1px solid rgba(29, 53, 87, 0.16);
+      border-radius: 9px;
+      color: var(--text-primary);
+      background: #fff;
+      font-weight: 650;
+    }
+
+    .eq-sliders {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(38px, 1fr));
+      gap: 12px;
+      padding: 24px 0 16px;
+      overflow-x: auto;
+    }
+
+    .eq-band { display: flex; align-items: center; flex-direction: column; gap: 12px; }
+    .eq-gain { color: var(--text-secondary); font-size: 10px; min-height: 12px; }
+    .eq-band input {
+      width: 112px;
+      height: 5px;
+      transform: rotate(-90deg);
+      margin: 44px 0;
+      accent-color: var(--accent-main);
+    }
+    .eq-band label { color: var(--text-secondary); font-size: 10px; white-space: nowrap; }
+
+    .eq-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(29, 53, 87, 0.1);
+    }
+
+    .eq-status { color: var(--text-secondary); font-size: 12px; }
+    .eq-reset {
+      border: 0;
+      background: transparent;
+      color: var(--accent-main);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+    @media (max-width: 768px) {
+      .app-container { flex-direction: column; height: calc(100vh - 82px); margin-top: 18px; }
+      .sidebar { width: 100%; padding: 9px 12px; flex-direction: row; align-items: center; gap: 10px; }
+      .logo-container { padding: 0 4px; }
+      .logo-text, .import-box { display: none; }
+      .ddm-logo-image { width: 36px; height: 36px; }
+      .nav-menu { flex-direction: row; gap: 2px; }
+      .nav-item { gap: 7px; padding: 9px 10px; font-size: 12px; }
+      .header-banner { align-items: flex-start; }
+      .playlist-cover { width: 100px; height: 100px; font-size: 38px; }
+      .playlist-meta h1 { font-size: 29px; }
+      .main-view { padding: 24px 18px; }
+      .volume-controls { display: none; }
+      .now-playing { width: 45%; }
+      .player-controls { width: 55%; }
+      .dynamic-island.expanded { width: 92vw; }
+      .player-bar { height: 82px; padding: 0 12px; gap: 8px; }
+      .control-buttons { gap: 15px; }
+      .np-art { width: 40px; height: 40px; }
+      .np-info h5 { max-width: 120px; }
+    }
+
+    @media (max-width: 480px) {
+      .nav-item { font-size: 0; gap: 0; }
+      .nav-item i { font-size: 15px; }
+      .playlist-cover { display: none; }
+      .browse-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .browse-card { padding: 10px; }
+      .player-controls { gap: 5px; }
+      .control-buttons { gap: 11px; }
+      .ctrl-btn { font-size: 14px; }
+      .ctrl-btn.play-main { width: 34px; height: 34px; }
+      .np-meta-row { font-size: 10px; }
+      .eq-sliders { grid-template-columns: repeat(10, 42px); gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- DYNAMIC ISLAND -->
+  <div class="dynamic-island-wrapper">
+    <div class="dynamic-island" id="dynamicIsland" onclick="toggleIsland(event)">
+      <div class="island-compact">
+        <div class="island-art-mini"><i class="fas fa-music"></i></div>
+        <span class="island-mini-title" id="islandMiniTitle">Memutar...</span>
+        <div class="eq-bars" id="eqContainer">
+          <div class="eq-bar" id="bar1"></div>
+          <div class="eq-bar" id="bar2"></div>
+          <div class="eq-bar" id="bar3"></div>
+          <div class="eq-bar" id="bar4"></div>
+        </div>
+      </div>
+
+      <div class="island-expanded" onclick="event.stopPropagation()">
+        <div class="island-exp-top">
+          <div class="island-art-large"><i class="fas fa-compact-disc"></i></div>
+          <div class="island-exp-info">
+            <div class="island-exp-title" id="islandExpTitle">Belum ada lagu</div>
+            <div class="island-exp-artist" id="islandExpArtist">DDM Audio Player</div>
+          </div>
+          <button class="island-btn" onclick="collapseIsland()" title="Tutup">
+            <i class="fas fa-chevron-up" style="font-size: 14px; color: var(--accent-blue-soft);"></i>
+          </button>
+        </div>
+        <div class="island-exp-controls">
+          <button class="island-btn" onclick="prevSong()"><i class="fas fa-backward-step"></i></button>
+          <button class="island-btn" onclick="togglePlay()" id="islandPlayBtn" style="font-size: 22px;">
+            <i class="fas fa-play"></i>
+          </button>
+          <button class="island-btn" onclick="nextSong()"><i class="fas fa-forward-step"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div class="app-container">
+    <aside class="sidebar">
+      <!-- LOGO DDM -->
+      <div class="logo-container">
+        <img class="ddm-logo-image" src="img/LOGO%20DDM%20NO%20BG.png" alt="Logo DDM">
+        <div class="logo-text">
+          <h2>DDM Music</h2>
+          <span>Declan Design Market</span>
+        </div>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item active" role="button" tabindex="0" data-view="homeView" onclick="showView('homeView', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showView('homeView',this)}"><i class="fas fa-house"></i> Beranda</li>
+        <li class="nav-item" role="button" tabindex="0" data-view="browseView" onclick="showView('browseView', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showView('browseView',this)}"><i class="fas fa-compass"></i> Telusuri</li>
+        <li class="nav-item" role="button" tabindex="0" data-view="equalizerView" onclick="showView('equalizerView', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showView('equalizerView',this)}"><i class="fas fa-sliders"></i> Equalizer</li>
+      </ul>
+
+      <div class="import-box">
+        <p style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Koleksi Audio DDM</p>
+        <p style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Impor file musik dari perangkatmu.</p>
+        <button class="btn-import" onclick="triggerImport()">
+          <i class="fas fa-upload"></i> Pilih File Audio
+        </button>
+      </div>
+      <input type="file" id="audioInput" accept="audio/*" multiple hidden onchange="handleFiles(this.files)">
+    </aside>
+
+    <main class="main-view" id="mainView" ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+      <section class="view-section" id="homeView">
+        <div class="header-banner">
+          <div class="playlist-cover"><i class="fas fa-headphones-alt"></i></div>
+          <div class="playlist-meta">
+            <h4 style="font-size: 12px; text-transform: uppercase; color: var(--accent-main); margin-bottom: 6px; letter-spacing: 1px; font-weight: 700;">
+              <i class="fas fa-compact-disc"></i> DDM Audio Player
+            </h4>
+            <h1>Koleksi Musik Saya</h1>
+            <p id="songCount" style="font-size: 13px; color: var(--text-secondary);">0 lagu tersedia</p>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <button class="btn-import" onclick="triggerImport()" style="margin-top: 0;">
+            <i class="fas fa-plus"></i> Impor Musik Baru
+          </button>
+        </div>
+
+        <table class="song-table">
+          <thead>
+            <tr>
+              <th style="width: 45px;">#</th>
+              <th>Judul Lagu</th>
+              <th>Format</th>
+              <th style="width: 80px; text-align: right;"><i class="far fa-clock"></i></th>
+            </tr>
+          </thead>
+          <tbody id="playlistBody">
+            <tr>
+              <td colspan="4">
+                <div class="empty-state">
+                  <i class="fas fa-compact-disc" style="font-size: 42px; margin-bottom: 10px; color: var(--accent-main); opacity: 0.6;"></i>
+                  <h3 style="color: var(--text-primary);">Belum ada lagu yang diimpor</h3>
+                  <p style="font-size: 13px; margin-top: 6px;">Impor file musik untuk mulai mendengarkan dengan DDM Music.</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="view-section" id="browseView" hidden>
+        <p class="page-kicker">Perpustakaan DDM</p>
+        <h1 class="page-heading">Telusuri musik</h1>
+        <p class="page-description">Temukan lagu favorit dari koleksi audio yang sudah kamu impor.</p>
+        <div class="browse-toolbar">
+          <label class="search-field">
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <input id="browseSearch" type="search" placeholder="Cari judul, artis, atau format..." autocomplete="off" oninput="renderBrowse()">
+          </label>
+        </div>
+        <div class="filter-chips" id="browseFilters" aria-label="Filter format audio"></div>
+        <div class="section-heading">
+          <div><h2>Semua audio</h2><p id="browseCount">0 lagu</p></div>
+        </div>
+        <div class="browse-grid" id="browseGrid"></div>
+      </section>
+
+      <section class="view-section" id="equalizerView" hidden>
+        <p class="page-kicker">Suara sesuai seleramu</p>
+        <h1 class="page-heading">Equalizer audio</h1>
+        <p class="page-description">Atur karakter suara dengan kontrol 10-band atau biarkan mode otomatis menyesuaikan audio secara real time.</p>
+        <div class="eq-panel">
+          <div class="eq-mode-row">
+            <div><h2>Pengaturan equalizer</h2><p id="eqModeDescription">Mode otomatis menyesuaikan frekuensi secara dinamis.</p></div>
+            <select class="eq-select" id="eqMode" aria-label="Mode equalizer" onchange="setEqualizerMode(this.value)">
+              <option value="auto">Otomatis</option>
+              <option value="manual">Manual</option>
+            </select>
+          </div>
+          <div class="eq-sliders" id="eqSliders"></div>
+          <div class="eq-footer">
+            <span class="eq-status" id="eqStatus" aria-live="polite">Equalizer otomatis aktif</span>
+            <button type="button" class="eq-reset" onclick="resetEqualizer()">Atur ulang ke netral</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- BOTTOM PLAYER BAR -->
+  <footer class="player-bar">
+    <div class="now-playing">
+      <div class="np-art"><i class="fas fa-music"></i></div>
+      <div class="np-info">
+        <h5 id="npTitle">Tidak ada lagu</h5>
+        <div class="np-meta-row" id="npArtist">Siap memutar audio</div>
+      </div>
+    </div>
+
+    <div class="player-controls">
+      <div class="control-buttons">
+        <button class="ctrl-btn" onclick="prevSong()"><i class="fas fa-step-backward"></i></button>
+        <button class="ctrl-btn play-main" onclick="togglePlay()" id="mainPlayBtn"><i class="fas fa-play"></i></button>
+        <button class="ctrl-btn" onclick="nextSong()"><i class="fas fa-step-forward"></i></button>
+      </div>
+
+      <div class="progress-container">
+        <span id="currentTime">0:00</span>
+        <input type="range" id="progress-bar" value="0" min="0" max="100" oninput="seekAudio(this.value)">
+        <span id="durationTime">0:00</span>
+      </div>
+    </div>
+
+    <div class="volume-controls">
+      <i class="fas fa-volume-up" id="volIcon"></i>
+      <input type="range" id="volume-bar" min="0" max="1" step="0.01" value="1" style="width: 90px;" oninput="setVolume(this.value)">
+    </div>
+  </footer>
+
+  <audio id="audioPlayer" preload="auto"></audio>
+
+  <script>
+    const audio = document.getElementById('audioPlayer');
+    const island = document.getElementById('dynamicIsland');
+    let playlist = [];
+    let currentIndex = -1;
+    let isPlaying = false;
+
+    let audioCtx;
+    let analyser;
+    let sourceNode;
+    let dataArray;
+    let animationId;
+    let eqFilters = [];
+    let eqMode = 'auto';
+    let browseFilter = 'all';
+    let autoEqFrame = 0;
+    const eqManualGains = Array(10).fill(0);
+    const eqFrequencies = [60, 170, 310, 600, 1000, 3000, 6000, 8000, 10000, 12000];
+    const eqLabels = ['60', '170', '310', '600', '1k', '3k', '6k', '8k', '10k', '12k'];
+
+    function initAudioEngine() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext({ latencyHint: 'playback' });
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        analyser.smoothingTimeConstant = 0.75;
+
+        sourceNode = audioCtx.createMediaElementSource(audio);
+        sourceNode.connect(analyser);
+        let nextNode = analyser;
+        eqFrequencies.forEach((frequency, index) => {
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = index === 0 ? 'lowshelf' : index === eqFrequencies.length - 1 ? 'highshelf' : 'peaking';
+          filter.frequency.value = frequency;
+          filter.Q.value = 1;
+          filter.gain.value = 0;
+          nextNode.connect(filter);
+          nextNode = filter;
+          eqFilters.push(filter);
+        });
+        nextNode.connect(audioCtx.destination);
+
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        renderEqControls();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function renderRealTimeBeat() {
+      if (!isPlaying || !analyser) return;
+
+      analyser.getByteFrequencyData(dataArray);
+
+      const bass = dataArray[1] || 0;
+      const lowMid = dataArray[3] || 0;
+      const mid = dataArray[6] || 0;
+      const high = dataArray[10] || 0;
+
+      const scaleHeight = (val) => Math.max(3, Math.min(16, (val / 255) * 16));
+
+      document.getElementById('bar1').style.height = scaleHeight(bass) + 'px';
+      document.getElementById('bar2').style.height = scaleHeight(lowMid) + 'px';
+      document.getElementById('bar3').style.height = scaleHeight(mid) + 'px';
+      document.getElementById('bar4').style.height = scaleHeight(high) + 'px';
+
+      if (eqMode === 'auto' && ++autoEqFrame % 8 === 0) {
+        applyAutomaticEqualizer();
+      }
+      animationId = requestAnimationFrame(renderRealTimeBeat);
+    }
+
+    function renderEqControls() {
+      document.getElementById('eqSliders').innerHTML = eqFrequencies.map((frequency, index) => `
+        <div class="eq-band">
+          <span class="eq-gain" id="eqGain${index}">${eqManualGains[index]} dB</span>
+          <input type="range" min="-12" max="12" step="1" value="${eqManualGains[index]}" aria-label="${frequency} hertz" data-band="${index}" oninput="setEqGain(${index}, this.value)">
+          <label>${eqLabels[index]} Hz</label>
+        </div>
+      `).join('');
+      document.querySelectorAll('.eq-band input').forEach(slider => {
+        slider.disabled = eqMode !== 'manual';
+      });
+    }
+
+    function setEqGain(index, value) {
+      const gain = Number(value);
+      eqManualGains[index] = gain;
+      document.getElementById(`eqGain${index}`).textContent = `${gain > 0 ? '+' : ''}${gain} dB`;
+      if (eqFilters[index]) eqFilters[index].gain.setTargetAtTime(gain, audioCtx.currentTime, 0.04);
+    }
+
+    function setEqualizerMode(mode) {
+      eqMode = mode === 'manual' ? 'manual' : 'auto';
+      const manual = eqMode === 'manual';
+      document.querySelectorAll('.eq-band input').forEach(slider => {
+        slider.disabled = !manual;
+      });
+      document.getElementById('eqMode').value = eqMode;
+      document.getElementById('eqModeDescription').textContent = manual
+        ? 'Geser setiap frekuensi untuk membentuk suara pilihanmu.'
+        : 'Mode otomatis menyesuaikan frekuensi secara dinamis saat musik diputar.';
+      document.getElementById('eqStatus').textContent = manual
+        ? 'Kontrol manual aktif'
+        : 'Equalizer otomatis aktif saat musik diputar';
+      if (manual) {
+        document.querySelectorAll('.eq-band input').forEach(slider => setEqGain(Number(slider.dataset.band), slider.value));
+      } else {
+        applyAutomaticEqualizer();
+      }
+    }
+
+    function applyAutomaticEqualizer() {
+      if (!analyser || !dataArray || !eqFilters.length) return;
+      analyser.getByteFrequencyData(dataArray);
+      const nyquistBin = dataArray.length;
+      const sampleRate = audioCtx.sampleRate;
+      const levels = eqFrequencies.map((frequency, index) => {
+        const lower = index === 0 ? 20 : Math.sqrt(eqFrequencies[index - 1] * frequency);
+        const upper = index === eqFrequencies.length - 1 ? sampleRate / 2 : Math.sqrt(frequency * eqFrequencies[index + 1]);
+        const firstBin = Math.max(1, Math.floor(lower * nyquistBin / (sampleRate / 2)));
+        const lastBin = Math.min(nyquistBin - 1, Math.ceil(upper * nyquistBin / (sampleRate / 2)));
+        let total = 0;
+        for (let bin = firstBin; bin <= lastBin; bin++) total += dataArray[bin];
+        return total / Math.max(1, lastBin - firstBin + 1);
+      });
+      const average = levels.reduce((sum, level) => sum + level, 0) / levels.length;
+      levels.forEach((level, index) => {
+        const target = Math.max(-3, Math.min(3, ((average - level) / 255) * 7));
+        eqFilters[index].gain.setTargetAtTime(target, audioCtx.currentTime, 0.35);
+      });
+      document.getElementById('eqStatus').textContent = isPlaying
+        ? 'Menyesuaikan suara secara real time'
+        : 'Equalizer otomatis siap';
+    }
+
+    function resetEqualizer() {
+      document.querySelectorAll('.eq-band input').forEach(slider => {
+        slider.value = 0;
+        setEqGain(Number(slider.dataset.band), 0);
+      });
+      if (eqMode === 'auto') applyAutomaticEqualizer();
+    }
+
+    function showView(viewId, navItem) {
+      document.querySelectorAll('.view-section').forEach(section => {
+        section.hidden = section.id !== viewId;
+      });
+      document.querySelectorAll('.nav-item[data-view]').forEach(item => {
+        const active = item === navItem;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-current', active ? 'page' : 'false');
+      });
+      if (viewId === 'browseView') renderBrowse();
+      if (viewId === 'equalizerView') {
+        initAudioEngine();
+        renderEqControls();
+        setEqualizerMode(eqMode);
+      }
+    }
+
+    function setBrowseFilter(filter) {
+      browseFilter = filter;
+      renderBrowse();
+    }
+
+    function renderBrowse() {
+      const filters = document.getElementById('browseFilters');
+      const grid = document.getElementById('browseGrid');
+      if (!filters || !grid) return;
+      const formats = [...new Set(playlist.map(song => song.format))].sort();
+      if (browseFilter !== 'all' && !formats.includes(browseFilter)) browseFilter = 'all';
+      filters.innerHTML = ['all', ...formats].map(format => `
+        <button type="button" class="filter-chip ${browseFilter === format ? 'active' : ''}" data-filter="${escapeHtml(format)}" onclick="setBrowseFilterFromButton(this)">
+          ${format === 'all' ? 'Semua' : escapeHtml(format)}
+        </button>
+      `).join('');
+
+      const query = document.getElementById('browseSearch').value.trim().toLowerCase();
+      const matches = playlist.map((song, index) => ({ song, index })).filter(({ song }) =>
+        (browseFilter === 'all' || song.format === browseFilter) &&
+        `${song.title} ${song.artist} ${song.format}`.toLowerCase().includes(query)
+      );
+      document.getElementById('browseCount').textContent = `${matches.length} lagu`;
+      grid.innerHTML = matches.length ? matches.map(({ song, index }) => `
+        <article class="browse-card" role="button" tabindex="0" onclick="playSong(${index})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();playSong(${index})}">
+          <div class="browse-card-art"><i class="fas fa-music"></i></div>
+          <h3 title="${escapeHtml(song.title)}">${escapeHtml(song.title)}</h3>
+          <p>${escapeHtml(song.artist)} · ${escapeHtml(song.format)}</p>
+        </article>
+      `).join('') : `
+        <div class="browse-empty">
+          <i class="fas fa-magnifying-glass" style="font-size:28px; color:var(--accent-main)"></i>
+          <p>${playlist.length ? 'Tidak ada lagu yang cocok. Coba kata kunci atau format lain.' : 'Koleksimu masih kosong. Impor file audio untuk mulai menelusuri musik.'}</p>
+          ${playlist.length ? '' : '<button class="btn-import" onclick="triggerImport()"><i class="fas fa-upload"></i> Impor Musik</button>'}
+        </div>
+      `;
+    }
+
+    function setBrowseFilterFromButton(button) {
+      setBrowseFilter(button.dataset.filter);
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[character]);
+    }
+
+    function triggerImport() {
+      document.getElementById('audioInput').click();
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      if (e.dataTransfer.files.length > 0) {
+        handleFiles(e.dataTransfer.files);
+      }
+    }
+
+    function handleFiles(files) {
+      const audioFiles = Array.from(files).filter(file => file.type.startsWith('audio/'));
+
+      if (audioFiles.length === 0) {
+        alert('Harap pilih file audio yang valid.');
+        return;
+      }
+
+      audioFiles.forEach(file => {
+        const url = URL.createObjectURL(file);
+        const cleanName = file.name.replace(/\.[^/.]+$/, "");
+        const ext = file.name.split('.').pop().toUpperCase();
+
+        const songObj = {
+          title: cleanName,
+          artist: 'DDM Audio',
+          format: ext,
+          url: url,
+          duration: '--:--'
+        };
+
+        const tempAudio = new Audio(url);
+        tempAudio.addEventListener('loadedmetadata', () => {
+          songObj.duration = formatTime(tempAudio.duration);
+          renderPlaylist();
+        });
+
+        playlist.push(songObj);
+      });
+
+      renderPlaylist();
+      if (currentIndex === -1 && playlist.length > 0) {
+        playSong(0);
+      }
+    }
+
+    function renderPlaylist() {
+      const tbody = document.getElementById('playlistBody');
+      document.getElementById('songCount').textContent = `${playlist.length} lagu tersedia`;
+
+      if (playlist.length === 0) {
+        renderBrowse();
+        return;
+      }
+
+      tbody.innerHTML = playlist.map((song, idx) => `
+        <tr class="song-row ${idx === currentIndex ? 'active' : ''}" onclick="playSong(${idx})">
+          <td>${idx === currentIndex && isPlaying ? '<i class="fas fa-volume-high" style="color:var(--accent-main)"></i>' : idx + 1}</td>
+          <td>
+            <div class="song-title-wrap">
+              <div class="song-icon"><i class="fas fa-music"></i></div>
+              <div>
+                <div class="song-title" style="${idx === currentIndex ? 'color:var(--accent-main);font-weight:700;' : ''}">${escapeHtml(song.title)}</div>
+                <div style="font-size: 12px; color: var(--text-secondary);">${escapeHtml(song.artist)}</div>
+              </div>
+            </div>
+          </td>
+          <td style="color: var(--text-secondary); font-size: 12px; font-weight: 600;">${escapeHtml(song.format)}</td>
+          <td style="text-align: right; color: var(--text-secondary);">${escapeHtml(song.duration)}</td>
+        </tr>
+      `).join('');
+      renderBrowse();
+    }
+
+    async function playSong(index) {
+      if (index < 0 || index >= playlist.length) return;
+      initAudioEngine();
+
+      currentIndex = index;
+      const song = playlist[currentIndex];
+
+      audio.src = song.url;
+      document.getElementById('npTitle').textContent = song.title;
+      document.getElementById('npArtist').textContent = song.format;
+      document.getElementById('islandMiniTitle').textContent = song.title;
+      document.getElementById('islandExpTitle').textContent = song.title;
+      document.getElementById('islandExpArtist').textContent = song.format;
+
+      renderPlaylist();
+      try {
+        await audio.play();
+        isPlaying = true;
+        updatePlayStateUI();
+        cancelAnimationFrame(animationId);
+        renderRealTimeBeat();
+      } catch (error) {
+        isPlaying = false;
+        updatePlayStateUI();
+        console.error('Audio gagal diputar:', error);
+        alert('Audio tidak dapat diputar. Coba pilih file audio lain atau periksa formatnya.');
+      }
+    }
+
+    function togglePlay() {
+      if (playlist.length === 0) {
+        triggerImport();
+        return;
+      }
+      if (currentIndex === -1) {
+        playSong(0);
+        return;
+      }
+
+      initAudioEngine();
+
+      if (audio.paused) {
+        audio.play().then(() => {
+          isPlaying = true;
+          renderRealTimeBeat();
+          updatePlayStateUI();
+          renderPlaylist();
+        }).catch(error => {
+          console.error('Audio gagal diputar:', error);
+          alert('Audio tidak dapat diputar. Coba pilih file audio lain atau periksa formatnya.');
+        });
+      } else {
+        audio.pause();
+        isPlaying = false;
+        cancelAnimationFrame(animationId);
+      }
+      updatePlayStateUI();
+      renderPlaylist();
+    }
+
+    function prevSong() {
+      if (playlist.length === 0) return;
+      let prev = currentIndex - 1;
+      if (prev < 0) prev = playlist.length - 1;
+      playSong(prev);
+    }
+
+    function nextSong() {
+      if (playlist.length === 0) return;
+      let next = (currentIndex + 1) % playlist.length;
+      playSong(next);
+    }
+
+    function updatePlayStateUI() {
+      const iconHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+      document.getElementById('mainPlayBtn').innerHTML = iconHTML;
+      document.getElementById('islandPlayBtn').innerHTML = iconHTML;
+
+      if (isPlaying) {
+        island.classList.add('playing');
+      } else {
+        island.classList.remove('playing');
+        island.classList.remove('expanded');
+      }
+    }
+
+    function toggleIsland(e) {
+      if (!isPlaying) return;
+      island.classList.toggle('expanded');
+    }
+
+    function collapseIsland() {
+      island.classList.remove('expanded');
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!island.contains(e.target)) {
+        collapseIsland();
+      }
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      if (!isNaN(audio.duration)) {
+        const progress = (audio.currentTime / audio.duration) * 100;
+        document.getElementById('progress-bar').value = progress;
+        document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
+        document.getElementById('durationTime').textContent = formatTime(audio.duration);
+      }
+    });
+
+    audio.addEventListener('ended', nextSong);
+
+    function seekAudio(val) {
+      if (!isNaN(audio.duration)) {
+        audio.currentTime = (val / 100) * audio.duration;
+      }
+    }
+
+    function setVolume(val) {
+      audio.volume = val;
+      const icon = document.getElementById('volIcon');
+      if (val == 0) icon.className = 'fas fa-volume-mute';
+      else if (val < 0.5) icon.className = 'fas fa-volume-down';
+      else icon.className = 'fas fa-volume-up';
+    }
+
+    function formatTime(sec) {
+      if (isNaN(sec)) return '0:00';
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+  </script>
+</body>
+</html>
