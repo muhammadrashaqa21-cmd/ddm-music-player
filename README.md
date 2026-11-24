@@ -9,7 +9,7 @@ DDM Music adalah pemutar audio web dan aplikasi Android berbasis Capacitor. Apli
 3. Unduh artifact **ddm-music-android**, lalu ekstrak `app-debug.apk`.
 4. Buka APK di perangkat Android. Jika diminta, izinkan pemasangan aplikasi dari sumber ini.
 
-Untuk membuat unduhan di halaman **Releases**, buat dan push tag versi, misalnya `v1.0.0`. Workflow akan membangun APK dan melampirkannya sebagai `ddm-music.apk`.
+Unduhan terbaru tersedia di [GitHub Releases](https://github.com/muhammadrashaqa21-cmd/ddm-music-player/releases/latest/download/ddm-music.apk). Untuk menerbitkan versi baru, buat dan push tag versi, misalnya `v1.0.1`. Workflow akan membangun APK dan melampirkannya sebagai `ddm-music.apk`.
 
 ## Build lokal
 
