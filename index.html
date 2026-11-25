@@ -39,45 +39,71 @@
     }
 
     .android-playback-indicator {
-      display: grid;
-      grid-template-columns: 48px minmax(0, 1fr) 44px;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 22px;
-      padding: 12px 16px;
-      min-height: 72px;
+      position: fixed;
+      z-index: 60;
+      top: calc(env(safe-area-inset-top, 0px) + 12px);
+      left: 50%;
+      display: flex;
+      flex-direction: column;
+      width: min(360px, calc(100vw - 28px));
+      padding: 8px;
       border: 1px solid rgba(29, 53, 87, 0.1);
-      border-radius: 20px;
-      background: var(--bg-surface);
+      border-radius: 28px;
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -10px) scale(0.96);
+      transform-origin: top center;
+      transition: border-radius 220ms ease, background-color 220ms ease;
     }
     .android-playback-indicator[hidden] { display: none; }
-
-    .android-playback-art {
-      width: 48px;
-      height: 48px;
-      display: grid;
-      place-items: center;
-      border-radius: 14px;
-      color: var(--accent-main);
-      background: var(--bg-elevated);
-      font-size: 19px;
+    .android-playback-indicator:not([hidden]) {
+      animation: playbackIslandEnter 260ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      pointer-events: auto;
     }
 
-    .android-playback-info { min-width: 0; }
-    .android-playback-label {
+    .android-island-main {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 4px;
-      color: var(--text-secondary);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.7px;
-      text-transform: uppercase;
+      gap: 8px;
+      min-height: 46px;
+    }
+
+    .android-island-track {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      padding: 2px;
+      border: 0;
+      border-radius: 22px;
+      color: inherit;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .android-island-info { flex: 1; min-width: 0; }
+
+    .android-playback-art {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      color: var(--accent-main);
+      background: var(--bg-elevated);
+      font-size: 17px;
     }
 
     .eq-bars {
       display: flex;
+      flex: 0 0 22px;
       align-items: flex-end;
       gap: 2px;
       width: 22px;
@@ -91,6 +117,13 @@
       background: var(--accent-main);
       transition: height 0.05s linear;
     }
+
+    .android-playback-indicator:not([hidden]) .eq-bar {
+      animation: playbackEqualizer 560ms ease-in-out infinite alternate;
+    }
+    .android-playback-indicator:not([hidden]) .eq-bar:nth-child(2) { animation-delay: 120ms; }
+    .android-playback-indicator:not([hidden]) .eq-bar:nth-child(3) { animation-delay: 240ms; }
+    .android-playback-indicator:not([hidden]) .eq-bar:nth-child(4) { animation-delay: 80ms; }
 
     .android-playback-title {
       overflow: hidden;
@@ -111,17 +144,84 @@
     }
 
     .android-playback-button {
-      width: 42px;
-      height: 42px;
+      display: grid;
+      flex: 0 0 40px;
+      place-items: center;
+      width: 40px;
+      height: 40px;
       border: 0;
       border-radius: 50%;
-      color: var(--text-primary);
-      background: var(--bg-elevated);
+      color: #fff;
+      background: var(--accent-main);
       cursor: pointer;
       font-size: 15px;
+      transition: background-color 160ms ease, transform 160ms ease;
     }
 
-    .android-playback-button:hover { background: #dceaf2; }
+    .android-playback-button:hover { background: var(--accent-hover); }
+    .android-playback-button:active { transform: scale(0.94); }
+
+    .android-island-details {
+      display: grid;
+      grid-template-rows: 0fr;
+      margin-top: 0;
+      opacity: 0;
+      transition: grid-template-rows 240ms ease, margin-top 240ms ease, opacity 180ms ease;
+    }
+
+    .android-island-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .android-island-controls button {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 50%;
+      color: var(--text-secondary);
+      background: transparent;
+      cursor: pointer;
+      transition: color 160ms ease, background-color 160ms ease, transform 160ms ease;
+    }
+
+    .android-island-controls button:hover,
+    .android-island-controls button.active {
+      color: var(--accent-main);
+      background: var(--bg-elevated);
+    }
+    .android-island-controls button:active { transform: scale(0.92); }
+
+    .android-playback-indicator.is-expanded {
+      border-radius: 24px;
+    }
+    .android-playback-indicator.is-expanded .android-island-details {
+      grid-template-rows: 1fr;
+      margin-top: 6px;
+      opacity: 1;
+    }
+
+    @keyframes playbackIslandEnter {
+      to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    }
+    @keyframes playbackEqualizer {
+      from { height: 3px; }
+      to { height: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .android-playback-indicator,
+      .android-playback-indicator *,
+      .android-playback-button,
+      .android-island-controls button {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
 
     /* ================= LAYOUT UTAMA ================= */
     .app-container {
@@ -478,6 +578,7 @@
       background: linear-gradient(180deg, #eaf3fa 0%, var(--bg-surface) 250px);
       padding: 34px clamp(18px, 3vw, 42px);
     }
+    body.has-active-island .main-view { padding-top: 104px; }
 
     .view-section[hidden] { display: none; }
 
@@ -768,6 +869,8 @@
         background: var(--bg-base);
         box-shadow: none;
       }
+      .android-playback-indicator { top: calc(env(safe-area-inset-top, 0px) + 70px); }
+      body.has-active-island .main-view { padding-top: 108px; }
       .volume-controls { display: none; }
       .player-bar {
         position: fixed;
@@ -834,24 +937,33 @@
     </aside>
 
     <main class="main-view" id="mainView" ondragover="event.preventDefault()" ondrop="handleDrop(event)">
-      <div class="android-playback-indicator" id="playbackIndicator" role="status" aria-live="polite" hidden>
-        <div class="android-playback-art"><i class="fas fa-music"></i></div>
-        <div class="android-playback-info">
-          <div class="android-playback-label">
-            <span>Sedang diputar</span>
+      <div class="android-playback-indicator" id="playbackIndicator" aria-label="Kontrol pemutaran musik" hidden>
+        <div class="android-island-main">
+          <button class="android-island-track" id="playbackIslandToggle" type="button" onclick="togglePlaybackIsland()" aria-expanded="false" aria-controls="islandDetails" aria-label="Buka kontrol pemutaran">
+            <div class="android-playback-art"><i class="fas fa-music"></i></div>
+            <div class="android-island-info">
+              <div class="android-playback-title" id="indicatorTitle"></div>
+              <div class="android-playback-artist" id="indicatorArtist"></div>
+            </div>
             <div class="eq-bars" id="eqContainer" aria-hidden="true">
               <div class="eq-bar" id="bar1"></div>
               <div class="eq-bar" id="bar2"></div>
               <div class="eq-bar" id="bar3"></div>
               <div class="eq-bar" id="bar4"></div>
             </div>
-          </div>
-          <div class="android-playback-title" id="indicatorTitle"></div>
-          <div class="android-playback-artist" id="indicatorArtist"></div>
+          </button>
+          <button class="android-playback-button" type="button" onclick="togglePlay()" id="indicatorPlayBtn" aria-label="Jeda">
+            <i class="fas fa-pause"></i>
+          </button>
         </div>
-        <button class="android-playback-button" type="button" onclick="togglePlay()" id="indicatorPlayBtn" aria-label="Jeda">
-          <i class="fas fa-pause"></i>
-        </button>
+        <div class="android-island-details" id="islandDetails" aria-hidden="true" inert>
+          <div class="android-island-controls">
+            <button type="button" onclick="toggleShuffle()" id="islandShuffleBtn" aria-label="Acak mati" aria-pressed="false" title="Acak mati"><i class="fas fa-shuffle"></i></button>
+            <button type="button" onclick="prevSong()" aria-label="Lagu sebelumnya"><i class="fas fa-backward-step"></i></button>
+            <button type="button" onclick="nextSong()" aria-label="Lagu berikutnya"><i class="fas fa-forward-step"></i></button>
+            <button type="button" onclick="toggleRepeat()" id="islandRepeatBtn" aria-label="Ulangi semua lagu" aria-pressed="true" title="Ulangi semua lagu"><i class="fas fa-repeat"></i></button>
+          </div>
+        </div>
       </div>
       <section class="view-section" id="homeView">
         <div class="header-banner">
@@ -1565,11 +1677,48 @@
       const indicatorPlayBtn = document.getElementById('indicatorPlayBtn');
       indicatorPlayBtn.innerHTML = iconHTML;
       indicatorPlayBtn.setAttribute('aria-label', isPlaying ? 'Jeda' : 'Putar');
-      document.getElementById('playbackIndicator').hidden = !isPlaying;
+      const playbackIndicator = document.getElementById('playbackIndicator');
+      playbackIndicator.hidden = !isPlaying;
+      document.body.classList.toggle('has-active-island', isPlaying);
+      if (!isPlaying) collapsePlaybackIsland();
       if (!isAndroidApp && 'mediaSession' in navigator) {
         navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
       }
     }
+
+    function togglePlaybackIsland() {
+      if (!isPlaying) return;
+      const playbackIndicator = document.getElementById('playbackIndicator');
+      const expanded = !playbackIndicator.classList.contains('is-expanded');
+      playbackIndicator.classList.toggle('is-expanded', expanded);
+      document.getElementById('playbackIslandToggle').setAttribute('aria-expanded', String(expanded));
+      document.getElementById('playbackIslandToggle').setAttribute(
+        'aria-label',
+        expanded ? 'Tutup kontrol pemutaran' : 'Buka kontrol pemutaran'
+      );
+      const details = document.getElementById('islandDetails');
+      details.setAttribute('aria-hidden', String(!expanded));
+      if (expanded) details.removeAttribute('inert');
+      else details.setAttribute('inert', '');
+    }
+
+    function collapsePlaybackIsland() {
+      const playbackIndicator = document.getElementById('playbackIndicator');
+      playbackIndicator.classList.remove('is-expanded');
+      document.getElementById('playbackIslandToggle').setAttribute('aria-expanded', 'false');
+      document.getElementById('playbackIslandToggle').setAttribute('aria-label', 'Buka kontrol pemutaran');
+      document.getElementById('islandDetails').setAttribute('aria-hidden', 'true');
+      document.getElementById('islandDetails').setAttribute('inert', '');
+    }
+
+    document.addEventListener('click', event => {
+      if (!document.getElementById('playbackIndicator').contains(event.target)) {
+        collapsePlaybackIsland();
+      }
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') collapsePlaybackIsland();
+    });
 
     audio.addEventListener('timeupdate', () => {
       if (!isNaN(audio.duration)) {
@@ -1612,11 +1761,13 @@
 
     function updateShuffleButton() {
       const label = isShuffle ? 'Acak aktif' : 'Acak mati';
-      const button = document.getElementById('shuffleBtn');
-      button.classList.toggle('active', isShuffle);
-      button.setAttribute('aria-pressed', String(isShuffle));
-      button.setAttribute('aria-label', label);
-      button.title = label;
+      ['shuffleBtn', 'islandShuffleBtn'].forEach(id => {
+        const button = document.getElementById(id);
+        button.classList.toggle('active', isShuffle);
+        button.setAttribute('aria-pressed', String(isShuffle));
+        button.setAttribute('aria-label', label);
+        button.title = label;
+      });
     }
 
     function toggleShuffle() {
@@ -1627,12 +1778,14 @@
 
     function updateRepeatButton() {
       const labels = { all: 'Ulangi semua lagu', one: 'Ulangi satu lagu', off: 'Ulangi mati' };
-      const button = document.getElementById('repeatBtn');
-      button.classList.toggle('active', repeatMode !== 'off');
-      button.setAttribute('aria-pressed', String(repeatMode !== 'off'));
-      button.setAttribute('aria-label', labels[repeatMode]);
-      button.title = labels[repeatMode];
-      button.innerHTML = `<i class="fas fa-repeat"></i>${repeatMode === 'one' ? '<span class="repeat-one-badge">1</span>' : ''}`;
+      ['repeatBtn', 'islandRepeatBtn'].forEach(id => {
+        const button = document.getElementById(id);
+        button.classList.toggle('active', repeatMode !== 'off');
+        button.setAttribute('aria-pressed', String(repeatMode !== 'off'));
+        button.setAttribute('aria-label', labels[repeatMode]);
+        button.title = labels[repeatMode];
+        button.innerHTML = `<i class="fas fa-repeat"></i>${repeatMode === 'one' ? '<span class="repeat-one-badge">1</span>' : ''}`;
+      });
     }
 
     function toggleRepeat() {
