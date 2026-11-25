@@ -16,7 +16,7 @@ Mode equalizer, nilai 10 band manual, volume, acak, dan ulangi disimpan otomatis
 
 Unduhan terbaru tersedia di [GitHub Releases](https://github.com/muhammadrashaqa21-cmd/ddm-music-player/releases/latest/download/ddm-music.apk). Untuk menerbitkan versi baru, buat dan push tag versi berikutnya. Workflow akan membangun APK dan melampirkannya sebagai `ddm-music.apk`.
 
-Rilis GitHub terbaru yang sudah berhasil adalah **v1.0.2**. Untuk rilis berikutnya, setelah perubahan dikirim ke branch utama, naikkan tag ke versi baru dan push tag tersebut. Workflow **Build Android APK** akan membuat rilis secara otomatis; jangan gunakan kembali tag yang sudah ada.
+Setiap rilis publik dibuat dari tag versi baru setelah perubahan dikirim ke branch utama. Workflow **Build Android APK** akan membuat rilis dan melampirkan `ddm-music.apk` secara otomatis; jangan gunakan kembali tag yang sudah ada.
 
 ## Build lokal
 
