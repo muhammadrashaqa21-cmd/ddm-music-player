@@ -39,6 +39,9 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
+      - name: Configure Android background playback
+        run: npm run configure:android
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 

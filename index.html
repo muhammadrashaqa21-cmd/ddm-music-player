@@ -18,7 +18,6 @@
       --accent-blue-soft: #ADE8F4;/* Biru muda pastel */
       --text-primary: #1D3557;    /* Biru gelap pekat untuk teks utama */
       --text-secondary: #6C757D;  /* Abu-abu netral */
-      --island-bg: #101820;       /* Hitam elegan untuk Dynamic Island */
     }
 
     * {
@@ -39,189 +38,90 @@
       user-select: none;
     }
 
-    /* ================= DYNAMIC ISLAND (TENGAH ATAS / KAMERA) ================= */
-    .dynamic-island-wrapper {
-      position: fixed;
-      top: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
-      display: flex;
-      justify-content: center;
-      pointer-events: none;
-    }
-
-    .dynamic-island {
-      pointer-events: auto;
-      background: var(--island-bg);
-      border: 1px solid rgba(173, 232, 244, 0.3);
-      box-shadow: 0 10px 28px rgba(29, 53, 87, 0.2), 0 0 15px rgba(58, 134, 239, 0.2);
-      border-radius: 30px;
-      width: 90px;
-      height: 28px;
-      padding: 0 8px;
-      display: flex;
+    .android-playback-indicator {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr) 44px;
       align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      overflow: hidden;
-      opacity: 0.45;
-      transform: scale(0.9);
-      transition: all 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+      gap: 12px;
+      margin-bottom: 22px;
+      padding: 12px 16px;
+      min-height: 72px;
+      border: 1px solid rgba(29, 53, 87, 0.1);
+      border-radius: 20px;
+      background: var(--bg-surface);
+    }
+    .android-playback-indicator[hidden] { display: none; }
+
+    .android-playback-art {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      color: var(--accent-main);
+      background: var(--bg-elevated);
+      font-size: 19px;
     }
 
-    .dynamic-island.playing {
-      opacity: 1;
-      transform: scale(1);
-      width: 260px;
-      height: 38px;
-      padding: 0 14px;
-      justify-content: space-between;
-    }
-
-    .dynamic-island.expanded {
-      width: 370px;
-      height: 165px;
-      border-radius: 36px;
-      padding: 18px 22px;
-      flex-direction: column;
-      justify-content: space-between;
-      cursor: default;
-      background: rgba(16, 24, 32, 0.95);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(173, 232, 244, 0.4);
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    .island-compact {
+    .android-playback-info { min-width: 0; }
+    .android-playback-label {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      transition: opacity 0.2s ease;
+      margin-bottom: 4px;
+      color: var(--text-secondary);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
     }
 
-    .dynamic-island.playing .island-compact { opacity: 1; }
-    .dynamic-island.expanded .island-compact { display: none; }
-
-    .island-art-mini {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent-main), var(--accent-cream));
-      color: #1D3557;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      animation: spin 8s linear infinite;
-    }
-
-    .island-mini-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: #F8F9FA;
-      max-width: 135px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin: 0 6px;
-    }
-
-    /* Equalizer Real-Time Beat */
     .eq-bars {
       display: flex;
       align-items: flex-end;
-      gap: 2.5px;
-      height: 16px;
-      width: 24px;
-      justify-content: flex-end;
+      gap: 2px;
+      width: 22px;
+      height: 12px;
     }
 
     .eq-bar {
       width: 3px;
       height: 3px;
-      background-color: var(--accent-blue-soft);
       border-radius: 2px;
+      background: var(--accent-main);
       transition: height 0.05s linear;
     }
 
-    .island-expanded {
-      display: none;
-      width: 100%;
-      height: 100%;
-      flex-direction: column;
-      justify-content: space-between;
-      color: #F8F9FA;
-    }
-
-    .dynamic-island.expanded .island-expanded {
-      display: flex;
-      animation: fadeIn 0.35s ease forwards;
-    }
-
-    .island-exp-top {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .island-art-large {
-      width: 54px;
-      height: 54px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, var(--accent-main), var(--accent-cream));
-      color: #1D3557;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      flex-shrink: 0;
-    }
-
-    .island-exp-info {
-      flex: 1;
+    .android-playback-title {
       overflow: hidden;
-    }
-
-    .island-exp-title {
-      font-size: 15px;
+      color: var(--text-primary);
+      font-size: 14px;
       font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .island-exp-artist {
-      font-size: 11px;
-      color: var(--accent-blue-soft);
-      margin-top: 3px;
+    .android-playback-artist {
+      overflow: hidden;
+      margin-top: 2px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .island-btn {
-      background: none;
-      border: none;
-      color: #F8F9FA;
-      font-size: 18px;
+    .android-playback-button {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 50%;
+      color: var(--text-primary);
+      background: var(--bg-elevated);
       cursor: pointer;
-      transition: transform 0.15s, color 0.15s;
+      font-size: 15px;
     }
 
-    .island-btn:hover {
-      color: var(--accent-blue-soft);
-      transform: scale(1.15);
-    }
-
-    .island-exp-controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 28px;
-    }
+    .android-playback-button:hover { background: #dceaf2; }
 
     /* ================= LAYOUT UTAMA ================= */
     .app-container {
@@ -500,6 +400,16 @@
     }
 
     .ctrl-btn:hover { color: var(--accent-main); }
+    .ctrl-btn.active { color: var(--accent-main); }
+    .ctrl-btn.mode-btn { position: relative; font-size: 14px; }
+    .repeat-one-badge {
+      position: absolute;
+      top: -3px;
+      right: -5px;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1;
+    }
 
     .ctrl-btn.play-main {
       width: 38px;
@@ -777,91 +687,123 @@
     }
 
     .eq-status { color: var(--text-secondary); font-size: 12px; }
-    .eq-reset {
+    #settingsStatus { display: block; margin-top: 5px; }
+    .eq-actions { display: flex; align-items: center; gap: 14px; }
+    .eq-reset, .eq-save {
       border: 0;
-      background: transparent;
-      color: var(--accent-main);
       font-weight: 700;
       cursor: pointer;
+    }
+    .eq-reset { background: transparent; color: var(--accent-main); }
+    .eq-save {
+      padding: 9px 12px;
+      border-radius: 9px;
+      background: var(--accent-main);
+      color: #fff;
     }
 
     @keyframes spin { 100% { transform: rotate(360deg); } }
     @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
     @media (max-width: 768px) {
-      .app-container { flex-direction: column; height: calc(100dvh - 82px - env(safe-area-inset-bottom)); margin-top: max(18px, env(safe-area-inset-top)); }
-      .sidebar { width: 100%; padding: 9px 12px; flex-direction: row; align-items: center; gap: 10px; }
-      .logo-container { padding: 0 4px; }
-      .logo-text, .import-box { display: none; }
-      .ddm-logo-image { width: 36px; height: 36px; }
-      .nav-menu { flex-direction: row; gap: 2px; }
-      .nav-item { gap: 7px; padding: 9px 10px; font-size: 12px; }
+      .app-container {
+        flex: none;
+        flex-direction: column;
+        gap: 0;
+        padding: 0;
+        height: calc(100dvh - 82px - env(safe-area-inset-bottom) - env(safe-area-inset-top));
+        margin-top: env(safe-area-inset-top);
+      }
+      .sidebar {
+        flex: 0 0 64px;
+        width: 100%;
+        height: 64px;
+        padding: 0 16px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+        border: 0;
+        border-bottom: 1px solid rgba(29, 53, 87, 0.1);
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .logo-container { padding: 0; gap: 10px; }
+      .logo-text { display: block; }
+      .logo-text span, .import-box { display: none; }
+      .ddm-logo-image { width: 38px; height: 38px; }
+      .nav-menu {
+        position: fixed;
+        z-index: 40;
+        right: 0;
+        bottom: calc(82px + env(safe-area-inset-bottom));
+        left: 0;
+        height: 64px;
+        padding: 6px 12px;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: space-around;
+        gap: 4px;
+        background: var(--bg-surface);
+        border-top: 1px solid rgba(29, 53, 87, 0.1);
+      }
+      .nav-item {
+        flex: 1;
+        flex-direction: column;
+        justify-content: center;
+        gap: 4px;
+        padding: 6px 4px;
+        border-radius: 14px;
+        font-size: 11px;
+      }
+      .nav-item i { font-size: 16px; }
       .header-banner { align-items: flex-start; }
       .playlist-cover { width: 100px; height: 100px; font-size: 38px; }
       .playlist-meta h1 { font-size: 29px; }
-      .main-view { padding: 24px 18px; }
+      .main-view {
+        min-height: 0;
+        padding: 18px 16px 88px;
+        border: 0;
+        border-radius: 0;
+        background: var(--bg-base);
+        box-shadow: none;
+      }
       .volume-controls { display: none; }
-      .now-playing { width: 45%; }
-      .player-controls { width: 55%; }
-      .dynamic-island.expanded { width: 92vw; }
-      .player-bar { height: calc(82px + env(safe-area-inset-bottom)); padding: 0 12px env(safe-area-inset-bottom); gap: 8px; }
-      .control-buttons { gap: 15px; }
-      .np-art { width: 40px; height: 40px; }
-      .np-info h5 { max-width: 120px; }
+      .player-bar {
+        position: fixed;
+        z-index: 50;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: calc(82px + env(safe-area-inset-bottom));
+        padding: 8px 14px env(safe-area-inset-bottom);
+        gap: 8px;
+        border-top: 1px solid rgba(29, 53, 87, 0.1);
+        background: var(--bg-surface);
+      }
+      .now-playing { width: 38%; gap: 8px; }
+      .player-controls { width: 62%; gap: 4px; }
+      .control-buttons { width: 100%; justify-content: space-between; gap: 4px; }
+      .np-art { width: 38px; height: 38px; flex-shrink: 0; }
+      .np-info { min-width: 0; }
+      .np-info h5 { max-width: 100%; font-size: 12px; }
+      .np-meta-row { font-size: 10px; }
+      .progress-container { width: 100%; gap: 6px; }
+      .progress-container span { font-size: 9px; }
+      .ctrl-btn { font-size: 14px; }
+      .ctrl-btn.mode-btn { font-size: 12px; }
+      .ctrl-btn.play-main { width: 34px; height: 34px; flex-shrink: 0; }
     }
 
     @media (max-width: 480px) {
-      .nav-item { font-size: 0; gap: 0; }
-      .nav-item i { font-size: 15px; }
       .playlist-cover { display: none; }
       .browse-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
       .browse-card { padding: 10px; }
-      .player-controls { gap: 5px; }
-      .control-buttons { gap: 11px; }
-      .ctrl-btn { font-size: 14px; }
-      .ctrl-btn.play-main { width: 34px; height: 34px; }
-      .np-meta-row { font-size: 10px; }
       .eq-sliders { grid-template-columns: repeat(10, 42px); gap: 8px; }
     }
   </style>
 </head>
 <body>
-
-  <!-- DYNAMIC ISLAND -->
-  <div class="dynamic-island-wrapper">
-    <div class="dynamic-island" id="dynamicIsland" onclick="toggleIsland(event)">
-      <div class="island-compact">
-        <div class="island-art-mini"><i class="fas fa-music"></i></div>
-        <span class="island-mini-title" id="islandMiniTitle">Memutar...</span>
-        <div class="eq-bars" id="eqContainer">
-          <div class="eq-bar" id="bar1"></div>
-          <div class="eq-bar" id="bar2"></div>
-          <div class="eq-bar" id="bar3"></div>
-          <div class="eq-bar" id="bar4"></div>
-        </div>
-      </div>
-
-      <div class="island-expanded" onclick="event.stopPropagation()">
-        <div class="island-exp-top">
-          <div class="island-art-large"><i class="fas fa-compact-disc"></i></div>
-          <div class="island-exp-info">
-            <div class="island-exp-title" id="islandExpTitle">Belum ada lagu</div>
-            <div class="island-exp-artist" id="islandExpArtist">DDM Audio Player</div>
-          </div>
-          <button class="island-btn" onclick="collapseIsland()" title="Tutup">
-            <i class="fas fa-chevron-up" style="font-size: 14px; color: var(--accent-blue-soft);"></i>
-          </button>
-        </div>
-        <div class="island-exp-controls">
-          <button class="island-btn" onclick="prevSong()"><i class="fas fa-backward-step"></i></button>
-          <button class="island-btn" onclick="togglePlay()" id="islandPlayBtn" style="font-size: 22px;">
-            <i class="fas fa-play"></i>
-          </button>
-          <button class="island-btn" onclick="nextSong()"><i class="fas fa-forward-step"></i></button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- MAIN APP CONTAINER -->
   <div class="app-container">
@@ -888,10 +830,29 @@
           <i class="fas fa-upload"></i> Pilih File Audio
         </button>
       </div>
-      <input type="file" id="audioInput" accept="audio/*" multiple hidden onchange="handleFiles(this.files)">
+      <input type="file" id="audioInput" accept="audio/*" multiple hidden onchange="handleFiles(this.files).catch(reportImportError)">
     </aside>
 
     <main class="main-view" id="mainView" ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+      <div class="android-playback-indicator" id="playbackIndicator" role="status" aria-live="polite" hidden>
+        <div class="android-playback-art"><i class="fas fa-music"></i></div>
+        <div class="android-playback-info">
+          <div class="android-playback-label">
+            <span>Sedang diputar</span>
+            <div class="eq-bars" id="eqContainer" aria-hidden="true">
+              <div class="eq-bar" id="bar1"></div>
+              <div class="eq-bar" id="bar2"></div>
+              <div class="eq-bar" id="bar3"></div>
+              <div class="eq-bar" id="bar4"></div>
+            </div>
+          </div>
+          <div class="android-playback-title" id="indicatorTitle"></div>
+          <div class="android-playback-artist" id="indicatorArtist"></div>
+        </div>
+        <button class="android-playback-button" type="button" onclick="togglePlay()" id="indicatorPlayBtn" aria-label="Jeda">
+          <i class="fas fa-pause"></i>
+        </button>
+      </div>
       <section class="view-section" id="homeView">
         <div class="header-banner">
           <div class="playlist-cover"><i class="fas fa-headphones-alt"></i></div>
@@ -964,8 +925,14 @@
           </div>
           <div class="eq-sliders" id="eqSliders"></div>
           <div class="eq-footer">
-            <span class="eq-status" id="eqStatus" aria-live="polite">Equalizer otomatis aktif</span>
-            <button type="button" class="eq-reset" onclick="resetEqualizer()">Atur ulang ke netral</button>
+            <div>
+              <span class="eq-status" id="eqStatus" aria-live="polite">Equalizer otomatis aktif</span>
+              <span class="eq-status" id="settingsStatus" aria-live="polite">Setelan disimpan di perangkat</span>
+            </div>
+            <div class="eq-actions">
+              <button type="button" class="eq-reset" onclick="resetEqualizer()">Atur ulang ke netral</button>
+              <button type="button" class="eq-save" onclick="saveAppSettings()">Simpan setelan</button>
+            </div>
           </div>
         </div>
       </section>
@@ -984,9 +951,11 @@
 
     <div class="player-controls">
       <div class="control-buttons">
+        <button class="ctrl-btn mode-btn" onclick="toggleShuffle()" id="shuffleBtn" title="Acak mati" aria-label="Acak mati" aria-pressed="false"><i class="fas fa-shuffle"></i></button>
         <button class="ctrl-btn" onclick="prevSong()"><i class="fas fa-step-backward"></i></button>
         <button class="ctrl-btn play-main" onclick="togglePlay()" id="mainPlayBtn"><i class="fas fa-play"></i></button>
         <button class="ctrl-btn" onclick="nextSong()"><i class="fas fa-step-forward"></i></button>
+        <button class="ctrl-btn mode-btn active" onclick="toggleRepeat()" id="repeatBtn" title="Ulangi semua lagu" aria-label="Ulangi semua lagu" aria-pressed="true"><i class="fas fa-repeat"></i></button>
       </div>
 
       <div class="progress-container">
@@ -998,7 +967,7 @@
 
     <div class="volume-controls">
       <i class="fas fa-volume-up" id="volIcon"></i>
-      <input type="range" id="volume-bar" min="0" max="1" step="0.01" value="1" style="width: 90px;" oninput="setVolume(this.value)">
+      <input type="range" id="volume-bar" min="0" max="1" step="0.01" value="1" style="width: 90px;" oninput="setVolume(this.value)" onchange="saveAppSettings()">
     </div>
   </footer>
 
@@ -1006,10 +975,17 @@
 
   <script>
     const audio = document.getElementById('audioPlayer');
-    const island = document.getElementById('dynamicIsland');
+    const nativeBridge = window.DDMNativeAudio || null;
+    const isAndroidApp = nativeBridge?.isAndroid === true;
     let playlist = [];
     let currentIndex = -1;
     let isPlaying = false;
+    let isShuffle = false;
+    let repeatMode = 'all';
+    let nativeInitialization;
+    let nativeActiveAssetId = null;
+    let nativeCurrentTime = 0;
+    let nativeDuration = 0;
 
     let audioCtx;
     let analyser;
@@ -1023,6 +999,134 @@
     const eqManualGains = Array(10).fill(0);
     const eqFrequencies = [60, 170, 310, 600, 1000, 3000, 6000, 8000, 10000, 12000];
     const eqLabels = ['60', '170', '310', '600', '1k', '3k', '6k', '8k', '10k', '12k'];
+    const appSettingsKey = 'ddmMusicSettings.v1';
+    let appVolume = 1;
+    let settingsSaveTimer;
+    let settingsLoadFailed = false;
+
+    if (isAndroidApp) {
+      document.querySelector('[data-view="equalizerView"]').hidden = true;
+    }
+
+    function ensureNativeAudio() {
+      if (!isAndroidApp) return Promise.resolve();
+      if (!nativeInitialization) {
+        nativeInitialization = (async () => {
+          await nativeBridge.NativeAudio.configure({
+            focus: true,
+            backgroundPlayback: true,
+            showNotification: true,
+            progressInterval: 0.25
+          });
+          await nativeBridge.NativeAudio.addListener('currentTime', event => {
+            if (event.assetId !== nativeActiveAssetId) return;
+            nativeCurrentTime = event.currentTime;
+            updatePlaybackProgress(nativeCurrentTime, nativeDuration);
+          });
+          await nativeBridge.NativeAudio.addListener('playbackState', event => {
+            if (event.assetId !== nativeActiveAssetId) return;
+            if (Number.isFinite(event.currentTime)) nativeCurrentTime = event.currentTime;
+            if (Number.isFinite(event.duration)) nativeDuration = event.duration;
+            isPlaying = event.state === 'playing';
+            updatePlaybackProgress(nativeCurrentTime, nativeDuration);
+            updatePlayStateUI();
+            renderPlaylist();
+          });
+          await nativeBridge.NativeAudio.addListener('complete', event => {
+            if (event.assetId === nativeActiveAssetId) handleSongEnded();
+          });
+        })().catch(error => {
+          nativeInitialization = null;
+          throw error;
+        });
+      }
+      return nativeInitialization;
+    }
+
+    function loadAppSettings() {
+      try {
+        const saved = localStorage.getItem(appSettingsKey);
+        if (!saved) return;
+        const settings = JSON.parse(saved);
+        if (!settings || typeof settings !== 'object' || Array.isArray(settings)) {
+          throw new Error('Saved app settings must be an object.');
+        }
+        if (typeof settings.shuffle === 'boolean') isShuffle = settings.shuffle;
+        if (['all', 'one', 'off'].includes(settings.repeatMode)) repeatMode = settings.repeatMode;
+        if (settings.eqMode === 'auto' || settings.eqMode === 'manual') eqMode = settings.eqMode;
+        if (Array.isArray(settings.eqManualGains)) {
+          settings.eqManualGains.slice(0, eqManualGains.length).forEach((gain, index) => {
+            if (Number.isFinite(gain)) eqManualGains[index] = Math.max(-12, Math.min(12, gain));
+          });
+        }
+        if (Number.isFinite(settings.volume)) appVolume = Math.max(0, Math.min(1, settings.volume));
+      } catch (error) {
+        settingsLoadFailed = true;
+        console.error('Gagal memuat setelan aplikasi:', error);
+      }
+    }
+
+    function saveAppSettings() {
+      window.clearTimeout(settingsSaveTimer);
+      const settings = {
+        shuffle: isShuffle,
+        repeatMode,
+        eqMode,
+        eqManualGains,
+        volume: appVolume
+      };
+      try {
+        localStorage.setItem(appSettingsKey, JSON.stringify(settings));
+        document.getElementById('settingsStatus').textContent = 'Setelan tersimpan di perangkat';
+      } catch (error) {
+        console.error('Gagal menyimpan setelan aplikasi:', error);
+        document.getElementById('settingsStatus').textContent = 'Setelan gagal disimpan';
+      }
+    }
+
+    function scheduleAppSettingsSave() {
+      document.getElementById('settingsStatus').textContent = 'Menyimpan setelan...';
+      window.clearTimeout(settingsSaveTimer);
+      settingsSaveTimer = window.setTimeout(saveAppSettings, 250);
+    }
+
+    function updatePlaybackProgress(currentTime, duration) {
+      if (!Number.isFinite(currentTime) || !Number.isFinite(duration) || duration <= 0) return;
+      const progress = (currentTime / duration) * 100;
+      document.getElementById('progress-bar').value = progress;
+      document.getElementById('currentTime').textContent = formatTime(currentTime);
+      document.getElementById('durationTime').textContent = formatTime(duration);
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (typeof reader.result !== 'string') {
+            reject(new Error('Audio file could not be read as base64.'));
+            return;
+          }
+          const separator = reader.result.indexOf(',');
+          if (separator === -1) {
+            reject(new Error('Audio file returned an invalid data URL.'));
+            return;
+          }
+          resolve(reader.result.slice(separator + 1));
+        };
+        reader.onerror = () => reject(reader.error || new Error('Audio file could not be read.'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function reportImportError(error) {
+      console.error('Gagal menyiapkan file audio:', error);
+      alert('File audio gagal disiapkan untuk pemutaran.');
+    }
+
+    function reportNativeAudioError(error) {
+      console.error('Pemutar audio Android gagal:', error);
+      alert('Audio tidak dapat diputar di perangkat ini.');
+    }
 
     function initAudioEngine() {
       if (!audioCtx) {
@@ -1040,7 +1144,7 @@
           filter.type = index === 0 ? 'lowshelf' : index === eqFrequencies.length - 1 ? 'highshelf' : 'peaking';
           filter.frequency.value = frequency;
           filter.Q.value = 1;
-          filter.gain.value = 0;
+          filter.gain.value = eqMode === 'manual' ? eqManualGains[index] : 0;
           nextNode.connect(filter);
           nextNode = filter;
           eqFilters.push(filter);
@@ -1081,8 +1185,8 @@
     function renderEqControls() {
       document.getElementById('eqSliders').innerHTML = eqFrequencies.map((frequency, index) => `
         <div class="eq-band">
-          <span class="eq-gain" id="eqGain${index}">${eqManualGains[index]} dB</span>
-          <input type="range" min="-12" max="12" step="1" value="${eqManualGains[index]}" aria-label="${frequency} hertz" data-band="${index}" oninput="setEqGain(${index}, this.value)">
+          <span class="eq-gain" id="eqGain${index}">${eqManualGains[index] > 0 ? '+' : ''}${eqManualGains[index]} dB</span>
+          <input type="range" min="-12" max="12" step="1" value="${eqManualGains[index]}" aria-label="${frequency} hertz" data-band="${index}" oninput="setEqGain(${index}, this.value)" onchange="saveAppSettings()">
           <label>${eqLabels[index]} Hz</label>
         </div>
       `).join('');
@@ -1092,10 +1196,13 @@
     }
 
     function setEqGain(index, value) {
-      const gain = Number(value);
+      if (!Number.isInteger(index) || index < 0 || index >= eqManualGains.length) return;
+      const gain = Math.max(-12, Math.min(12, Number(value)));
+      if (!Number.isFinite(gain)) return;
       eqManualGains[index] = gain;
       document.getElementById(`eqGain${index}`).textContent = `${gain > 0 ? '+' : ''}${gain} dB`;
       if (eqFilters[index]) eqFilters[index].gain.setTargetAtTime(gain, audioCtx.currentTime, 0.04);
+      scheduleAppSettingsSave();
     }
 
     function setEqualizerMode(mode) {
@@ -1116,6 +1223,7 @@
       } else {
         applyAutomaticEqualizer();
       }
+      saveAppSettings();
     }
 
     function applyAutomaticEqualizer() {
@@ -1148,6 +1256,7 @@
         setEqGain(Number(slider.dataset.band), 0);
       });
       if (eqMode === 'auto') applyAutomaticEqualizer();
+      saveAppSettings();
     }
 
     function showView(viewId, navItem) {
@@ -1161,6 +1270,7 @@
       });
       if (viewId === 'browseView') renderBrowse();
       if (viewId === 'equalizerView') {
+        if (isAndroidApp) return;
         initAudioEngine();
         renderEqControls();
         setEqualizerMode(eqMode);
@@ -1222,11 +1332,11 @@
     function handleDrop(e) {
       e.preventDefault();
       if (e.dataTransfer.files.length > 0) {
-        handleFiles(e.dataTransfer.files);
+        handleFiles(e.dataTransfer.files).catch(reportImportError);
       }
     }
 
-    function handleFiles(files) {
+    async function handleFiles(files) {
       const audioFiles = Array.from(files).filter(file => file.type.startsWith('audio/'));
 
       if (audioFiles.length === 0) {
@@ -1234,18 +1344,32 @@
         return;
       }
 
-      audioFiles.forEach(file => {
+      for (const file of audioFiles) {
         const url = URL.createObjectURL(file);
         const cleanName = file.name.replace(/\.[^/.]+$/, "");
         const ext = file.name.split('.').pop().toUpperCase();
+        const nativeAssetId = `ddm-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
         const songObj = {
           title: cleanName,
           artist: 'DDM Audio',
           format: ext,
           url: url,
-          duration: '--:--'
+          duration: '--:--',
+          nativeAssetId,
+          nativePath: ''
         };
+
+        if (isAndroidApp) {
+          const extension = file.name.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g, '') || 'audio';
+          const savedFile = await nativeBridge.Filesystem.writeFile({
+            path: `music/${nativeAssetId}.${extension}`,
+            data: await fileToBase64(file),
+            directory: nativeBridge.Directory.Data,
+            recursive: true
+          });
+          songObj.nativePath = savedFile.uri;
+        }
 
         const tempAudio = new Audio(url);
         tempAudio.addEventListener('loadedmetadata', () => {
@@ -1254,11 +1378,11 @@
         });
 
         playlist.push(songObj);
-      });
+      }
 
       renderPlaylist();
       if (currentIndex === -1 && playlist.length > 0) {
-        playSong(0);
+        await playSong(0);
       }
     }
 
@@ -1292,25 +1416,59 @@
 
     async function playSong(index) {
       if (index < 0 || index >= playlist.length) return;
-      initAudioEngine();
-
-      currentIndex = index;
-      const song = playlist[currentIndex];
-
-      audio.src = song.url;
-      document.getElementById('npTitle').textContent = song.title;
-      document.getElementById('npArtist').textContent = song.format;
-      document.getElementById('islandMiniTitle').textContent = song.title;
-      document.getElementById('islandExpTitle').textContent = song.title;
-      document.getElementById('islandExpArtist').textContent = song.format;
-
-      renderPlaylist();
       try {
-        await audio.play();
+        if (!isAndroidApp) initAudioEngine();
+        currentIndex = index;
+        const song = playlist[currentIndex];
+
+        if (isAndroidApp) {
+          await ensureNativeAudio();
+          if (nativeActiveAssetId && nativeActiveAssetId !== song.nativeAssetId) {
+            await nativeBridge.NativeAudio.stop({ assetId: nativeActiveAssetId });
+            await nativeBridge.NativeAudio.unload({ assetId: nativeActiveAssetId });
+            nativeActiveAssetId = null;
+          }
+          if (nativeActiveAssetId !== song.nativeAssetId) {
+            await nativeBridge.NativeAudio.preload({
+              assetId: song.nativeAssetId,
+              assetPath: song.nativePath,
+              isUrl: true,
+              volume: Number(document.getElementById('volume-bar').value),
+              notificationMetadata: {
+                title: song.title,
+                artist: song.artist,
+                album: 'DDM Music'
+              }
+            });
+            nativeActiveAssetId = song.nativeAssetId;
+          } else {
+            await nativeBridge.NativeAudio.setCurrentTime({ assetId: song.nativeAssetId, time: 0 });
+          }
+          const duration = await nativeBridge.NativeAudio.getDuration({ assetId: song.nativeAssetId });
+          nativeDuration = duration.duration;
+          nativeCurrentTime = 0;
+          updatePlaybackProgress(nativeCurrentTime, nativeDuration);
+        } else {
+          audio.src = song.url;
+          updateMediaSessionMetadata(song);
+        }
+        document.getElementById('npTitle').textContent = song.title;
+        document.getElementById('npArtist').textContent = song.format;
+        document.getElementById('indicatorTitle').textContent = song.title;
+        document.getElementById('indicatorArtist').textContent = song.artist;
+
+        renderPlaylist();
+        if (isAndroidApp) {
+          await nativeBridge.NativeAudio.play({ assetId: song.nativeAssetId, time: 0 });
+        } else {
+          await audio.play();
+        }
         isPlaying = true;
         updatePlayStateUI();
-        cancelAnimationFrame(animationId);
-        renderRealTimeBeat();
+        if (!isAndroidApp) {
+          cancelAnimationFrame(animationId);
+          renderRealTimeBeat();
+        }
       } catch (error) {
         isPlaying = false;
         updatePlayStateUI();
@@ -1329,29 +1487,50 @@
         return;
       }
 
+      if (isAndroidApp) {
+        ensureNativeAudio().then(async () => {
+          if (!nativeActiveAssetId) {
+            await playSong(currentIndex);
+            return;
+          }
+          const shouldPlay = !isPlaying;
+          if (shouldPlay) {
+            await nativeBridge.NativeAudio.play({
+              assetId: nativeActiveAssetId,
+              time: nativeCurrentTime
+            });
+          } else {
+            await nativeBridge.NativeAudio.pause({ assetId: nativeActiveAssetId });
+          }
+          isPlaying = shouldPlay;
+          updatePlayStateUI();
+          renderPlaylist();
+        }).catch(reportNativeAudioError);
+        return;
+      }
+
       initAudioEngine();
 
       if (audio.paused) {
-        audio.play().then(() => {
-          isPlaying = true;
-          renderRealTimeBeat();
+        audio.play().catch(error => {
+          isPlaying = false;
           updatePlayStateUI();
           renderPlaylist();
-        }).catch(error => {
           console.error('Audio gagal diputar:', error);
           alert('Audio tidak dapat diputar. Coba pilih file audio lain atau periksa formatnya.');
         });
       } else {
         audio.pause();
-        isPlaying = false;
-        cancelAnimationFrame(animationId);
       }
-      updatePlayStateUI();
-      renderPlaylist();
     }
 
     function prevSong() {
       if (playlist.length === 0) return;
+      if (isShuffle && playlist.length > 1) {
+        const choices = playlist.map((_, index) => index).filter(index => index !== currentIndex);
+        playSong(choices[Math.floor(Math.random() * choices.length)]);
+        return;
+      }
       let prev = currentIndex - 1;
       if (prev < 0) prev = playlist.length - 1;
       playSong(prev);
@@ -1359,37 +1538,38 @@
 
     function nextSong() {
       if (playlist.length === 0) return;
-      let next = (currentIndex + 1) % playlist.length;
+      const next = getNextSongIndex();
+      if (next === -1) {
+        if (isAndroidApp && nativeActiveAssetId) {
+          nativeBridge.NativeAudio.stop({ assetId: nativeActiveAssetId })
+            .then(() => {
+              nativeCurrentTime = 0;
+              isPlaying = false;
+              updatePlaybackProgress(0, nativeDuration);
+              updatePlayStateUI();
+              renderPlaylist();
+            })
+            .catch(reportNativeAudioError);
+        } else {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+        return;
+      }
       playSong(next);
     }
 
     function updatePlayStateUI() {
       const iconHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
       document.getElementById('mainPlayBtn').innerHTML = iconHTML;
-      document.getElementById('islandPlayBtn').innerHTML = iconHTML;
-
-      if (isPlaying) {
-        island.classList.add('playing');
-      } else {
-        island.classList.remove('playing');
-        island.classList.remove('expanded');
+      const indicatorPlayBtn = document.getElementById('indicatorPlayBtn');
+      indicatorPlayBtn.innerHTML = iconHTML;
+      indicatorPlayBtn.setAttribute('aria-label', isPlaying ? 'Jeda' : 'Putar');
+      document.getElementById('playbackIndicator').hidden = !isPlaying;
+      if (!isAndroidApp && 'mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
       }
     }
-
-    function toggleIsland(e) {
-      if (!isPlaying) return;
-      island.classList.toggle('expanded');
-    }
-
-    function collapseIsland() {
-      island.classList.remove('expanded');
-    }
-
-    document.addEventListener('click', (e) => {
-      if (!island.contains(e.target)) {
-        collapseIsland();
-      }
-    });
 
     audio.addEventListener('timeupdate', () => {
       if (!isNaN(audio.duration)) {
@@ -1400,20 +1580,168 @@
       }
     });
 
-    audio.addEventListener('ended', nextSong);
-
     function seekAudio(val) {
-      if (!isNaN(audio.duration)) {
+      if (isAndroidApp && nativeActiveAssetId && nativeDuration > 0) {
+        const time = (val / 100) * nativeDuration;
+        nativeBridge.NativeAudio.setCurrentTime({ assetId: nativeActiveAssetId, time })
+          .then(() => {
+            nativeCurrentTime = time;
+            updatePlaybackProgress(nativeCurrentTime, nativeDuration);
+          })
+          .catch(reportNativeAudioError);
+      } else if (!isNaN(audio.duration)) {
         audio.currentTime = (val / 100) * audio.duration;
       }
     }
 
     function setVolume(val) {
-      audio.volume = val;
+      const volume = Number(val);
+      if (!Number.isFinite(volume)) return;
+      appVolume = Math.max(0, Math.min(1, volume));
+      audio.volume = appVolume;
+      if (isAndroidApp && nativeActiveAssetId) {
+        nativeBridge.NativeAudio.setVolume({ assetId: nativeActiveAssetId, volume: appVolume })
+          .catch(reportNativeAudioError);
+      }
       const icon = document.getElementById('volIcon');
-      if (val == 0) icon.className = 'fas fa-volume-mute';
-      else if (val < 0.5) icon.className = 'fas fa-volume-down';
+      if (appVolume === 0) icon.className = 'fas fa-volume-mute';
+      else if (appVolume < 0.5) icon.className = 'fas fa-volume-down';
       else icon.className = 'fas fa-volume-up';
+      scheduleAppSettingsSave();
+    }
+
+    function updateShuffleButton() {
+      const label = isShuffle ? 'Acak aktif' : 'Acak mati';
+      const button = document.getElementById('shuffleBtn');
+      button.classList.toggle('active', isShuffle);
+      button.setAttribute('aria-pressed', String(isShuffle));
+      button.setAttribute('aria-label', label);
+      button.title = label;
+    }
+
+    function toggleShuffle() {
+      isShuffle = !isShuffle;
+      updateShuffleButton();
+      saveAppSettings();
+    }
+
+    function updateRepeatButton() {
+      const labels = { all: 'Ulangi semua lagu', one: 'Ulangi satu lagu', off: 'Ulangi mati' };
+      const button = document.getElementById('repeatBtn');
+      button.classList.toggle('active', repeatMode !== 'off');
+      button.setAttribute('aria-pressed', String(repeatMode !== 'off'));
+      button.setAttribute('aria-label', labels[repeatMode]);
+      button.title = labels[repeatMode];
+      button.innerHTML = `<i class="fas fa-repeat"></i>${repeatMode === 'one' ? '<span class="repeat-one-badge">1</span>' : ''}`;
+    }
+
+    function toggleRepeat() {
+      repeatMode = repeatMode === 'all' ? 'one' : repeatMode === 'one' ? 'off' : 'all';
+      updateRepeatButton();
+      saveAppSettings();
+    }
+
+    function getNextSongIndex() {
+      if (isShuffle && playlist.length > 1) {
+        const choices = playlist.map((_, index) => index).filter(index => index !== currentIndex);
+        return choices[Math.floor(Math.random() * choices.length)];
+      }
+      if (currentIndex < playlist.length - 1) return currentIndex + 1;
+      return repeatMode === 'all' ? 0 : -1;
+    }
+
+    function updateMediaSessionMetadata(song) {
+      if (isAndroidApp || !('mediaSession' in navigator) || !('MediaMetadata' in window)) return;
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: song.title,
+        artist: song.artist,
+        album: 'DDM Music'
+      });
+    }
+
+    function registerMediaSessionAction(action, handler) {
+      if (!('mediaSession' in navigator)) return;
+      try {
+        navigator.mediaSession.setActionHandler(action, handler);
+      } catch (error) {
+        if (error.name !== 'NotSupportedError') throw error;
+      }
+    }
+
+    function updateMediaSessionPosition() {
+      if (isAndroidApp || !('mediaSession' in navigator) || typeof navigator.mediaSession.setPositionState !== 'function') return;
+      if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
+      navigator.mediaSession.setPositionState({
+        duration: audio.duration,
+        playbackRate: audio.playbackRate,
+        position: Math.min(audio.currentTime, audio.duration)
+      });
+    }
+
+    function setupMediaSession() {
+      registerMediaSessionAction('play', togglePlay);
+      registerMediaSessionAction('pause', togglePlay);
+      registerMediaSessionAction('previoustrack', prevSong);
+      registerMediaSessionAction('nexttrack', nextSong);
+      registerMediaSessionAction('seekto', details => {
+        if (Number.isFinite(details.seekTime)) audio.currentTime = details.seekTime;
+      });
+      registerMediaSessionAction('seekbackward', details => {
+        audio.currentTime = Math.max(0, audio.currentTime - (details.seekOffset || 10));
+      });
+      registerMediaSessionAction('seekforward', details => {
+        if (Number.isFinite(audio.duration)) {
+          audio.currentTime = Math.min(audio.duration, audio.currentTime + (details.seekOffset || 10));
+        }
+      });
+    }
+
+    function handleSongEnded() {
+      if (isAndroidApp) {
+        if (repeatMode === 'one' && nativeActiveAssetId) {
+          nativeBridge.NativeAudio.setCurrentTime({ assetId: nativeActiveAssetId, time: 0 })
+            .then(() => nativeBridge.NativeAudio.play({ assetId: nativeActiveAssetId, time: 0 }))
+            .catch(reportNativeAudioError);
+          return;
+        }
+        const nextNative = getNextSongIndex();
+        if (nextNative === -1) {
+          if (nativeActiveAssetId) {
+            nativeBridge.NativeAudio.stop({ assetId: nativeActiveAssetId })
+              .then(() => {
+                nativeCurrentTime = 0;
+                isPlaying = false;
+                updatePlaybackProgress(0, nativeDuration);
+                updatePlayStateUI();
+                renderPlaylist();
+              })
+              .catch(reportNativeAudioError);
+          }
+          return;
+        }
+        playSong(nextNative);
+        return;
+      }
+
+      if (repeatMode === 'one') {
+        audio.currentTime = 0;
+        audio.play().catch(error => {
+          isPlaying = false;
+          updatePlayStateUI();
+          console.error('Audio gagal diputar ulang:', error);
+          alert('Audio tidak dapat diputar ulang. Coba pilih file audio lain atau periksa formatnya.');
+        });
+        return;
+      }
+      const next = getNextSongIndex();
+      if (next === -1) {
+        audio.currentTime = 0;
+        isPlaying = false;
+        updatePlayStateUI();
+        renderPlaylist();
+        return;
+      }
+      playSong(next);
     }
 
     function formatTime(sec) {
@@ -1422,6 +1750,35 @@
       const s = Math.floor(sec % 60);
       return `${m}:${s < 10 ? '0' : ''}${s}`;
     }
+
+    loadAppSettings();
+    document.getElementById('volume-bar').value = String(appVolume);
+    audio.volume = appVolume;
+    renderEqControls();
+    setEqualizerMode(eqMode);
+    updateShuffleButton();
+    updateRepeatButton();
+    if (settingsLoadFailed) {
+      document.getElementById('settingsStatus').textContent = 'Setelan gagal dimuat; nilai awal digunakan';
+    }
+
+    if (!isAndroidApp) setupMediaSession();
+    audio.addEventListener('play', () => {
+      isPlaying = true;
+      updatePlayStateUI();
+      renderRealTimeBeat();
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+    });
+    audio.addEventListener('pause', () => {
+      isPlaying = false;
+      cancelAnimationFrame(animationId);
+      updatePlayStateUI();
+      renderPlaylist();
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+    });
+    audio.addEventListener('timeupdate', updateMediaSessionPosition);
+    audio.addEventListener('loadedmetadata', updateMediaSessionPosition);
+    audio.addEventListener('ended', handleSongEnded);
   </script>
 </body>
 </html>

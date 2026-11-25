@@ -4,14 +4,18 @@
   "private": true,
   "scripts": {
     "build:web": "node scripts/prepare-web.js",
-    "android:add": "npm run build:web && cap add android",
-    "android:sync": "npm run build:web && cap sync android"
+    "configure:android": "node scripts/configure-android.js",
+    "android:add": "npm run build:web && cap add android && npm run configure:android",
+    "android:sync": "npm run build:web && cap sync android && npm run configure:android"
   },
   "dependencies": {
+    "@capgo/capacitor-native-audio": "8.5.6",
     "@capacitor/android": "8.6.2",
-    "@capacitor/core": "8.6.2"
+    "@capacitor/core": "8.6.2",
+    "@capacitor/filesystem": "8.1.5"
   },
   "devDependencies": {
-    "@capacitor/cli": "8.6.2"
+    "@capacitor/cli": "8.6.2",
+    "esbuild": "0.28.2"
   }
 }
