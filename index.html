@@ -1235,6 +1235,16 @@
       alert('File audio gagal disiapkan untuk pemutaran.');
     }
 
+    const audioFileExtensions = new Set([
+      'aac', 'aif', 'aiff', 'amr', 'flac', 'm4a', 'm4b', 'mp3', 'oga', 'ogg', 'opus', 'wav', 'wma'
+    ]);
+
+    function isAudioFile(file) {
+      if (typeof file.type === 'string' && file.type.toLowerCase().startsWith('audio/')) return true;
+      const extension = file.name.match(/\.([^.]+)$/)?.[1]?.toLowerCase();
+      return audioFileExtensions.has(extension);
+    }
+
     function reportNativeAudioError(error) {
       console.error('Pemutar audio Android gagal:', error);
       alert('Audio tidak dapat diputar di perangkat ini.');
@@ -1449,7 +1459,7 @@
     }
 
     async function handleFiles(files) {
-      const audioFiles = Array.from(files).filter(file => file.type.startsWith('audio/'));
+      const audioFiles = Array.from(files).filter(isAudioFile);
 
       if (audioFiles.length === 0) {
         alert('Harap pilih file audio yang valid.');
